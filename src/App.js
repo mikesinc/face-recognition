@@ -9,9 +9,10 @@ import SignIn from './components/SignIn/SignIn.js';
 import Register from './components/Register/Register.js';
 import Particles from 'react-particles-js';
 import Clarifai from 'clarifai';
+require('dotenv').config();
 
 const app = new Clarifai.App({
-  apiKey: '1791be1a9ee0424988bb9b785660512a' //API key usually hidden in .env but here until server is constructed
+  apiKey: process.env.REACT_APP_API_KEY
  });
 
 const particleOptions = {
