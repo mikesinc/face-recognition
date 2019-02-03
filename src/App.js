@@ -17,6 +17,23 @@ const particleOptions = {
         enable: true,
         value_area: 800
       }
+    },
+    size: {
+      value: 5.0,
+      random: true,
+      anim: {
+        enable: true,
+        speed: 10
+      }
+    },
+    opacity: {
+      value: 1,
+      random: true
+    },
+    line_linked: {
+      enable: true,
+      distance: 50,
+      opacity: 0.1
     }
   }
 }
