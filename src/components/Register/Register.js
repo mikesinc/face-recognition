@@ -23,22 +23,26 @@ class Register extends React.Component {
     }
 
     onSubmitSignIn = () => {
-        fetch('https://shrouded-journey-20606.herokuapp.com/register', {
-            method: 'post',
-            headers: {'Content-Type': 'application/json'},
-            body: JSON.stringify({
-                email: this.state.email,
-                password: this.state.password,
-                name: this.state.name
+        if (this.state.email === '' || this.state.password === '' || this.state.name === '' || !this.state.email.includes('@')) {
+            alert('Please enter a valid email, password and your name.');
+        } else {
+            fetch('https://shrouded-journey-20606.herokuapp.com/register', {
+                method: 'post',
+                headers: {'Content-Type': 'application/json'},
+                body: JSON.stringify({
+                    email: this.state.email,
+                    password: this.state.password,
+                    name: this.state.name
+                })
             })
-        })
-            .then(response => response.json())
-            .then(user => {
-                if (user.id) {
-                    this.props.loadUser(user);
-                    this.props.onRouteChange('home');
-                }
-            })
+                .then(response => response.json())
+                .then(user => {
+                    if (user.id) {
+                        this.props.loadUser(user);
+                        this.props.onRouteChange('home');
+                    }
+                })
+        }
     }
 
     render() {
@@ -78,7 +82,7 @@ class Register extends React.Component {
                     </fieldset>
                     <div className="">
                         <input 
-                            className="b ph3 pv2 input-reset ba b--black bg-transparent grow pointer f6 dib" 
+                            className="b ph3 pv2 input-reset ba bg-transparent grow pointer f6 dib" 
                             type="submit" 
                             value="Register"
                             onClick={this.onSubmitSignIn}

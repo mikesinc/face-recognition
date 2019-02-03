@@ -18,14 +18,17 @@ class SignIn extends React.Component {
     }
 
     onSubmitSignIn = () => {
-        fetch('https://shrouded-journey-20606.herokuapp.com/signin', {
-            method: 'post',
-            headers: {'Content-Type': 'application/json'},
-            body: JSON.stringify({
-                email: this.state.signInEmail,
-                password: this.state.signInPassword
+        if (this.state.signInEmail === '' || this.state.signInPassword === '' || !this.state.signInEmail.includes('@')) {
+            alert('Please enter a valid email and password.');
+        } else {
+            fetch('https://shrouded-journey-20606.herokuapp.com/signin', {
+                method: 'post',
+                headers: {'Content-Type': 'application/json'},
+                body: JSON.stringify({
+                    email: this.state.signInEmail,
+                    password: this.state.signInPassword
+                })
             })
-        })
             .then(response => response.json())
             .then(user => {
                 if (user.id) {
@@ -33,6 +36,7 @@ class SignIn extends React.Component {
                     this.props.onRouteChange('home');
                 }
             })
+        }   
     }
 
     render() {
@@ -64,14 +68,14 @@ class SignIn extends React.Component {
                     </fieldset>
                     <div className="">
                         <input 
-                            className="b ph3 pv2 input-reset ba b--black bg-transparent grow pointer f6 dib" 
+                            className="b ph3 pv2 input-reset ba bg-transparent grow pointer f6 dib" 
                             type="submit" 
                             value="Sign in"
                             onClick={this.onSubmitSignIn}
                             />
                     </div>
                     <div className="lh-copy mt3">
-                        <p onClick={() => onRouteChange('register')} href="#0" className="f6 link dim black db pointer">Register</p>
+                        <p onClick={() => onRouteChange('register')} href="#0" className="f6 link dim db pointer">Register</p>
                     </div>
                 </div>
             </main>
