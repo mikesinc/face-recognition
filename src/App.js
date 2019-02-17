@@ -107,6 +107,7 @@ class App extends Component {
     })
     .then(response => response.json())
     .then(response => {
+      this.displayFaceBox(this.calculateFaceLocation(response));
       if (response) {
         fetch('https://shrouded-journey-20606.herokuapp.com/image', {
           method: 'put',
@@ -122,7 +123,6 @@ class App extends Component {
         })
         .catch(console.log)
       }
-      this.displayFaceBox(this.calculateFaceLocation(response));
     })
     .catch(err => console.log(err));
   }
