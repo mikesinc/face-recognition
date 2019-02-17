@@ -4,10 +4,11 @@ import Navigation from './components/Navigation/Navigation.js';
 import Logo from './components/Logo/Logo.js';
 import ImageLinkForm from './components/ImageLinkForm/ImageLinkForm.js';
 import Rank from './components/Rank/Rank.js';
-import FaceRecognition from './components/FaceRecognition/FaceRecognition.js';
+import FaceRecognitionList from './components/FaceRecognitionList/FaceRecognitionList.js';
 import SignIn from './components/SignIn/SignIn.js';
 import Register from './components/Register/Register.js';
 import Particles from 'react-particles-js';
+import ErrorBoundry from'./components/ErrorBoundry/ErrorBoundry.js';
 
 const particleOptions = {
   particles: {
@@ -41,7 +42,7 @@ const particleOptions = {
 const initialState = {
     input: '',
     imageUrl: '',
-    box: {},
+    boxes: [],
     route: 'signin',
     isSignedIn: false,
     user: {
@@ -70,20 +71,25 @@ class App extends Component {
   }
 
   calculateFaceLocation = (data) => {
-    const clarifaiFace = data.outputs[0].data.regions[0].region_info.bounding_box;
-    const image = document.getElementById('inputImage');
-    const width = Number(image.width);
-    const height = Number(image.height);
-    return {
-      leftCol: clarifaiFace.left_col * width,
-      topRow: clarifaiFace.top_row * height,
-      rightCol: width - (clarifaiFace.right_col * width),
-      bottomRow: height - (clarifaiFace.bottom_row * height)
-    }
-  }
+      const image = document.getElementById('inputImage');
+      const width = Number(image.width);
+      const height = Number(image.height);
+      let boxes = [];
+    for (let i = 0; i < data.outputs[0].data.regions.length; i++) {
+      const clarifaiFace = data.outputs[0].data.regions[i].region_info.bounding_box;
+      // console.log(clarifaiFace);
+      boxes.push(Object({
+        leftCol: clarifaiFace.left_col * width,
+        topRow: clarifaiFace.top_row * height,
+        rightCol: width - (clarifaiFace.right_col * width),
+        bottomRow: height - (clarifaiFace.bottom_row * height)
+      }))
+      }
+      return boxes;
+    }    
 
-  displayFaceBox = (box) => {
-    this.setState({box: box});
+  displayFaceBox = (boxes) => {
+    this.setState({boxes: boxes});
   }
 
   onInputChange = (event) => {
@@ -106,7 +112,8 @@ class App extends Component {
           method: 'put',
           headers: {'Content-Type': 'application/json'},
           body: JSON.stringify({
-            id: this.state.user.id
+            id: this.state.user.id,
+            boxes: Number(this.state.boxes.length)
           })
         })
         .then(response => response.json())
@@ -115,7 +122,7 @@ class App extends Component {
         })
         .catch(console.log)
       }
-      this.displayFaceBox(this.calculateFaceLocation(response))
+      this.displayFaceBox(this.calculateFaceLocation(response));
     })
     .catch(err => console.log(err));
   }
@@ -130,7 +137,7 @@ class App extends Component {
   }
 
   render() {
-    const { isSignedIn, imageUrl, route, box } = this.state;
+    const { isSignedIn, imageUrl, route, boxes } = this.state;
     return (
       <div className="App">
         <Particles 
@@ -147,10 +154,12 @@ class App extends Component {
               onInputChange={this.onInputChange} 
               onButtonSubmit={this.onButtonSubmit}
             />
-            <FaceRecognition 
-              box={box} 
-              imageUrl={imageUrl}
-            />
+            <ErrorBoundry>
+              <FaceRecognitionList 
+                boxes={boxes} 
+                imageUrl={imageUrl}
+              />
+            </ErrorBoundry>
           </div>
           : (
             route === 'signin'
